@@ -1,6 +1,13 @@
-def create_multi_day_trip_agent():
-    """Create the Progressive Multi-Day Trip Planner agent"""
-    return Agent(
+import logging
+import os
+
+from dotenv import load_dotenv
+from google.adk.agents import LlmAgent
+from google.adk.tools import google_search
+
+load_dotenv()
+
+root_agent = LlmAgent(
         name="multi_day_trip_agent",
         model="gemini-2.5-flash",
         description="Agent that progressively plans a multi-day trip, remembering previous days and adapting to user feedback.",
@@ -20,5 +27,4 @@ def create_multi_day_trip_agent():
         tools=[google_search]
     )
 
-multi_day_agent = create_multi_day_trip_agent()
-print(f"🗺️ Agent '{multi_day_agent.name}' is created and ready to plan and adapt!")
+print(f"🗺️ Agent '{root_agent.name}' is created and ready to plan and adapt!")
