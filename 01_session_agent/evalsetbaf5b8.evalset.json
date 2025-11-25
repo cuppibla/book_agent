@@ -1,0 +1,252 @@
+{
+  "eval_set_id": "evalsetbaf5b8",
+  "name": "evalsetbaf5b8",
+  "eval_cases": [
+    {
+      "eval_id": "casee7240b",
+      "conversation": [
+        {
+          "invocation_id": "e-fbdf6579-214e-4c7e-a737-b96f71a048a0",
+          "user_content": {
+            "parts": [
+              {
+                "text": "hi"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Hello! I can help you find books in Orangeville. 📚 Which book are you looking for today? 😊\n"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {},
+          "creation_timestamp": 1763707270.933468
+        },
+        {
+          "invocation_id": "e-a839ae72-fe6d-4437-867e-63b892a2e781",
+          "user_content": {
+            "parts": [
+              {
+                "text": "can you please look up if you have harry porter book"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "I couldn't find \"Harry Potter\" at the Orangeville Public Library. 😔\n\nLet me check local bookstores for you! What genre would you say \"Harry Potter\" falls under? (e.g., Fantasy, Young Adult, Adventure) 🧙‍♀️",
+                "thought_signature": "Co8DAdHtim9mFIwyxMcF2TermpSWU0QbK_31ERQxE_tW_gbxJcr6g-3wV-39SJpIv46Qv3M-JXYaXfC-EXnTNcniJ5yXiAMNTbgl7aVd74WYgW9waJn7ZPFdvpqYyoY9ggv9t2B2D1AuPSvCUl0-ZCNiyWcMA8gU_vEYaGmBoEf6dlFAjl9Sg79GuLHt0WQF6vS71xvEd3b-9syC7t1ByC9PGjbKox5rA7JS_U21Ufx47ayUhjXNTt0Eh7ITqdoT35yrSKyc5yR4clZblrNIZh7DUKcQ73zdzTFloNr-c7X7xdV_NfIOGUJN6DB84wVoiSiSb9XBhBDbEzncVwkSzUozZuDTo83-6eTb4ULOe_8qrGTFp32BTulunxzYJdR5GgUePSIGLyEyaKJN7x8jPGiIPsw2hg5gdDPu4KPLrZX4N0ADaAUBV889c-PTEhGo5mGo66z2uK4dBqAcEEJ-5JZ0tpGewHQ3RysaU4mUVXzltNXpFdpcfLTSuM6lQXJG7hQQrd7vqctGWIlP6XlJjwWD"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "invocation_events": [
+              {
+                "author": "book_finder",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-ce2138ef-04b2-4d99-b5a4-0c3f4502a3a1",
+                        "args": {
+                          "title": "Harry Potter"
+                        },
+                        "name": "search_local_library"
+                      },
+                      "thought_signature": "CuEBAdHtim_azrtD4JAyPW_WkeWNPflEYsAzg3eF-ADHWWn28_shTz2W3rL2vIlzYG1VryirF1zxcNCbw14V-lAZtIZcjlwrHSVGh-w8g5Zwi-ZRX5VB9JhhO7ClyAvN0IMnQsmhHTzJ7OnhTkgHNgKgHi1rrDg3PXipaoW7LoDlwIgK_0iKt9JOS35Y47MWtBaNkYJ0nLuRaULc7Ia8G5DYbmfdmNEER8ewRc162tfLM2dghFhNZDsytKojcbrSYbR3lgekeLtG3ecNjvQyRWfpp5Vq34iHk-3Y6sGsovxox9m3"
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "book_finder",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-ce2138ef-04b2-4d99-b5a4-0c3f4502a3a1",
+                        "name": "search_local_library",
+                        "response": {
+                          "copies": 0,
+                          "branch": null,
+                          "available": false,
+                          "message": "Book not found in library system"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              }
+            ]
+          },
+          "creation_timestamp": 1763707300.403949
+        },
+        {
+          "invocation_id": "e-505103d6-de53-4381-86a2-0907dc448c94",
+          "user_content": {
+            "parts": [
+              {
+                "text": "fantasy"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Great news! Galaxy Books Orangeville might have your Harry Potter book! 🥳\n\nThey are located at 123 Main Street, Downtown Orangeville, and specialize in fantasy books. You can call them at (555) 554-7110 to confirm availability.\n\nWould you like me to also check for online ordering options in case you'd prefer that? 💻\n"
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "invocation_events": [
+              {
+                "author": "book_finder",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-e017ddff-a6dd-45e4-bd48-eecd5f7768d9",
+                        "args": {
+                          "genre": "fantasy"
+                        },
+                        "name": "find_local_bookstore"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "book_finder",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-e017ddff-a6dd-45e4-bd48-eecd5f7768d9",
+                        "name": "find_local_bookstore",
+                        "response": {
+                          "store_name": "Galaxy Books Orangeville",
+                          "address": "123 Main Street, Downtown Orangeville",
+                          "phone": "(555) 554-7110",
+                          "specialties": "Science fiction, fantasy, and speculative fiction",
+                          "note": "Extensive fantasy collection including rare editions"
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              }
+            ]
+          },
+          "creation_timestamp": 1763707315.235841
+        },
+        {
+          "invocation_id": "e-4636c67e-836d-43ad-ba4d-e3136b65f33e",
+          "user_content": {
+            "parts": [
+              {
+                "text": "yes check online options"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Okay, I've found some online options for \"Harry Potter\"! 💻\n\nThe fastest online option is **MapleLeaf Books Online**, with an estimated delivery of 2-3 business days. They offer free shipping over $35.\n\nHere are your options, from fastest to a bit longer:\n\n1.  **Galaxy Books Orangeville:** (Call first to confirm availability as they specialize in fantasy!) 📞 (555) 554-7110, located at 123 Main Street, Downtown Orangeville. This is likely your fastest option if they have it in stock.\n2.  **MapleLeaf Books Online:** Estimated delivery of 2-3 business days. 📦\n3.  **BookStream Orangeville:** Estimated delivery of 3-5 business days, with a $4.99 flat rate shipping.\n4.  You can also place a special order through **BookHaven Orangeville** at (555) 555-2665. They can order any book in print, and it would arrive in 5-10 business days, supporting a local business! 🏪\n\nI hope this helps you get your book quickly! 😊",
+                "thought_signature": "CtUJAdHtim_yGaTLDw7m6NOnuIt45p4qTQX57DV3YqivhtvfDXqFLrF7t8h0GJfS-9Ih1Dm5A7-Vi0Qk5EhxWF0Ad_C38h9Q2aqakpchNPqmK1Nghcm59B7ILlUjNB4AszJV6-NcToFG-xDnFJrovJna0vjskCwnoFGwxFkXiiztiVNo0jTKH4rCxGpfBkshZg-oyVci7_cNavtHBqpxe9W5bT5xswkbV2gARQFKgYZsQf6oJ7rKmHJDtc7pHQC0Eg_e1VGHmKo_hnKnuP7F5zFhKX2PStmKwPM8OSE5zZRi5aD65mjdn8gZ8G10-dHnWI7k_36kbGrPswdF4NL_VXeghjH11ZNGiN2m2895MsMRuZDRm5ISOf4cJoKq8S_teIuz2tFiZP5VD8VEt7IN-u5xHibcu1bzmbNUlW3rf_RgUQ6o0WCN6p6CxMV7Qbcg5pE3GZT5sSSbwicoMdNTuhdVX6w2VapkBLE_O8F2Jpu7yidzZcVF4OOnumFuKUgfaw_AmsBUo8qO4H9mkKXoglW2ONQsb7Za06-y-PpQt3cpcH-j_PTJ8-mmRrZ2pFGBBQEOC81P0p7GSlV0uRFy5-rA2dr188gGJjuQv190_F1Nw24PH-2O3XUZRHlx-zqiiscTbhz7Sqp2X5RO4jG-qRXgVJ8eClL_j1ZLaJzwcyXECevCEJWHIcruki0il2y_I_kW2-Gq3GuTnWIQKaytiCNS1N17JEJ4IY--Lq4QgWyMZMLxfuyxsYKCv7kvVn4Xz1PvOIhnh3zCdC2Xu4tsTG9vTrwHcBENJLpnY6OEBudg0tFK2YUJOnsQ0wTyqaJ2NZ4RfBmAhGTAz3R02zs6okanCNos3durL1C7kyReCiTJi4PG-1oOj7BJ8rUwQnO9Zl0Ln79dYSPL8CZ9os2GoLmf8F5zIojTKqKru5GQTIGZMEhBfhzRNdA0LzyvfmhcEnIL9zoMJjIORdHX3OMBSLDzL4vCG-0ZG5JCvdY3XgYl-B1dI07iU75CZZWahztmvqHxISHp-tnRdLcxPBAFXnJmgcScC7faO8GYkDJVv6naRrmtDUSymiUIJyQfxNLOEwjpMDgmXg5veaM-W1-B3flBYP0rC_ospCNtFFKnXoJ3uN-m7U1A4i4Qfaf6FepGWovCtnViQcSmrtTRw1SJVykU-ZK0oiuiI2RrmnW6BAub2toVA_cF6OKeMYFkgXKqrxTLSun1upIl0l-p7uD4gInAiok99t4L2fpH4ZOOhqbAEnwTc9iJVBqY7haS2n7ACcXrdqfaZM5OPDdPDH_cu4szSHGG-MUYH92hIYxQVjqV0YuJR16xVAlkNrsIM7fL7-P3TzUTnky3vUJ0okoUqOFx1eMEU8Gw0apkiE44uAUG9lhkB83jpFt3JYmlTgu97C3HnsQw0BEhy9pF5YjbG4R1KzPuJvopKwvlUUPyLxh9FZTxXsjMYSkIsLDZxedWvcpUjRt0lucFas50Zr432AqXvCxGvHBVndxlkls_UFwUtMlnzmRrY4jsbcLoybw8onIf6757YH7gYoRHLy78EF0d7mEcPJxF_nUK5AqNkTC0w7fFf0GFziP9hiWXy5eBlU6U1kUpEbLwOm1gdYGUT87mi03kR65J0hlffR7y59qU-tnlGp31DQ=="
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "invocation_events": [
+              {
+                "author": "book_finder",
+                "content": {
+                  "parts": [
+                    {
+                      "function_call": {
+                        "id": "adk-22099a32-da84-46f8-a083-1291ef3f0993",
+                        "args": {
+                          "title": "Harry Potter"
+                        },
+                        "name": "order_online"
+                      }
+                    }
+                  ],
+                  "role": "model"
+                }
+              },
+              {
+                "author": "book_finder",
+                "content": {
+                  "parts": [
+                    {
+                      "function_response": {
+                        "id": "adk-22099a32-da84-46f8-a083-1291ef3f0993",
+                        "name": "order_online",
+                        "response": {
+                          "title": "Harry Potter",
+                          "online_retailers": [
+                            {
+                              "name": "MapleLeaf Books Online",
+                              "estimated_delivery": "2-3 business days",
+                              "price_range": "$18-35",
+                              "shipping": "Free shipping over $35",
+                              "note": "Woman-owned and operated"
+                            },
+                            {
+                              "name": "BookStream Orangeville",
+                              "estimated_delivery": "3-5 business days",
+                              "price_range": "$15-32",
+                              "shipping": "$4.99 flat rate shipping",
+                              "note": "Rewards program available"
+                            },
+                            {
+                              "name": "The Reading Post",
+                              "estimated_delivery": "4-7 business days",
+                              "price_range": "$12-28",
+                              "shipping": "Free shipping on all orders",
+                              "note": "Discount retailer with overstock books"
+                            }
+                          ],
+                          "special_order_option": {
+                            "service": "BookHaven Orangeville Special Orders",
+                            "phone": "(555) 555-2665",
+                            "estimated_time": "5-10 business days",
+                            "note": "Support local business - they can order any book in print"
+                          },
+                          "recommendation": "Consider calling BookHaven Orangeville first for special orders to support local business."
+                        }
+                      }
+                    }
+                  ],
+                  "role": "user"
+                }
+              }
+            ]
+          },
+          "creation_timestamp": 1763707329.926402
+        }
+      ],
+      "session_input": {
+        "app_name": "01_session_agent",
+        "user_id": "user"
+      },
+      "creation_timestamp": 1763707349.12814
+    }
+  ],
+  "creation_timestamp": 1763707340.9766972
+}
