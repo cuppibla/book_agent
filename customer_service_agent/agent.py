@@ -6,8 +6,9 @@ from google.adk.agents import Agent
 
 load_dotenv()
 
+import copy
 # Mock data stored in memory for the session
-MOCK_DATA = {
+DEFAULT_MOCK_DATA = {
     "CUST001": {
         "orders": [
             {"order_id": "ORD-101", "date": "2023-10-15", "items": ["Wireless Headphones"], "total": 120.00, "status": "delivered"},
@@ -20,6 +21,12 @@ MOCK_DATA = {
         ]
     }
 }
+
+MOCK_DATA = copy.deepcopy(DEFAULT_MOCK_DATA)
+
+def reset_mock_data():
+    global MOCK_DATA
+    MOCK_DATA = copy.deepcopy(DEFAULT_MOCK_DATA)
 
 def get_purchase_history(customer_id: str) -> Dict[str, Any]:
     """
@@ -108,7 +115,7 @@ Your goal is to assist customers with their purchase history, refunds, and produ
 **Guidelines:**
 1.  **Identify the Customer:** If a customer asks about their history or order status, ask for their Customer ID if they haven't provided it.
 2.  **Check Order Status:** Use `get_purchase_history` to see the current status of orders (e.g., ordered, shipped, delivered, refunded).
-3.  **Handle Refunds:** When a customer wants a refund, ask for the Order ID and the reason for the refund. Use the `issue_refund` tool.
+3.  **Handle Refunds:** When a customer wants a refund, ask for the Order ID and the reason for the refund. Use the `issue_refund` tool. If the customer mentions damage, use "damaged" as the reason.
 4.  **Product Inquiries:** For product questions, use `lookup_product_info`. If a product is out of stock, inform the customer.
 5.  **Be Polite & Professional:** Always use a friendly tone and emojis where appropriate.
 6.  **Prioritize Solutions:** Try to resolve the customer's issue quickly using the available tools.
