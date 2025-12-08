@@ -1,12 +1,12 @@
-from google.adk.evaluation.agent_evaluator import AgentEvaluator
 import pytest
-import importlib
-import sys
 import os
+import sys
+import importlib
+from google.adk.evaluation import AgentEvaluator
 
 @pytest.mark.asyncio
-async def test_with_single_test_file():
-    """Test the agent's basic ability via a session file."""
+async def test_with_golden_dataset():
+    """Test the agent's ability using the golden dataset."""
     # Load the agent module robustly
     module_name = "customer_service_agent.agent"
     try:
@@ -20,10 +20,14 @@ async def test_with_single_test_file():
         agent_module = importlib.import_module(module_name)
         if hasattr(agent_module, 'reset_mock_data'):
             agent_module.reset_mock_data()
-    
+
     # Use absolute path to the eval file to be robust to where pytest is run
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    eval_file = os.path.join(script_dir, "eval.test.json")
+    eval_file = os.path.join(script_dir, "evalset780045.evalset.json")
+    config_file = os.path.join(script_dir, "test_config.json")
+    import json
+    with open(config_file, 'r') as f:
+        config_data = json.load(f)
     
     await AgentEvaluator.evaluate(
         agent_module=module_name,

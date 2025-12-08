@@ -1,0 +1,258 @@
+warning: `VIRTUAL_ENV=customer_service_agent/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-9.0.1, pluggy-1.6.0
+rootdir: /Users/qingyue/Documents/adk_eval/customer_service_agent
+configfile: pyproject.toml
+plugins: anyio-4.11.0, asyncio-1.3.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1 item
+
+customer_service_agent/test_agent_eval.py F                              [100%]
+
+=================================== FAILURES ===================================
+__________________________ test_with_single_test_file __________________________
+
+    @pytest.mark.asyncio
+    async def test_with_single_test_file():
+        """Test the agent's basic ability via a session file."""
+        # Load the agent module robustly
+        module_name = "customer_service_agent.agent"
+        try:
+            agent_module = importlib.import_module(module_name)
+            # Reset the mock data to ensure a fresh state for the test
+            if hasattr(agent_module, 'reset_mock_data'):
+                agent_module.reset_mock_data()
+        except ImportError:
+            # Fallback if running from a different context
+            sys.path.append(os.getcwd())
+            agent_module = importlib.import_module(module_name)
+            if hasattr(agent_module, 'reset_mock_data'):
+                agent_module.reset_mock_data()
+    
+        # Use absolute path to the eval file to be robust to where pytest is run
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        eval_file = os.path.join(script_dir, "eval.test.json")
+    
+>       await AgentEvaluator.evaluate(
+            agent_module=module_name,
+            eval_dataset_file_path_or_dir=eval_file,
+        )
+
+customer_service_agent/test_agent_eval.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../book_agent/.venv/lib/python3.13/site-packages/google/adk/evaluation/agent_evaluator.py:241: in evaluate
+    await AgentEvaluator.evaluate_eval_set(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+agent_module = 'customer_service_agent.agent'
+eval_set = EvalSet(eval_set_id='customer_service_eval', name='Customer Service Agent Evaluation', description='Evaluation suite f...er_id='eval_user_3', state={}), creation_timestamp=0.0, rubrics=None, final_session_state={})], creation_timestamp=0.0)
+criteria = None
+eval_config = EvalConfig(criteria={'tool_trajectory_avg_score': 0.8, 'response_match_score': 0.5}, user_simulator_config=None)
+num_runs = 2, agent_name = None, print_detailed_results = True
+
+    @staticmethod
+    async def evaluate_eval_set(
+        agent_module: str,
+        eval_set: EvalSet,
+        criteria: Optional[dict[str, float]] = None,
+        eval_config: Optional[EvalConfig] = None,
+        num_runs: int = NUM_RUNS,
+        agent_name: Optional[str] = None,
+        print_detailed_results: bool = True,
+    ):
+      """Evaluates an agent using the given EvalSet.
+    
+      Args:
+        agent_module: The path to python module that contains the definition of
+          the agent. There is convention in place here, where the code is going to
+          look for 'root_agent' or `get_agent_async` in the loaded module.
+        eval_set: The eval set.
+        criteria: Evaluation criteria, a dictionary of metric names to their
+          respective thresholds. This field is deprecated.
+        eval_config: The evauation config.
+        num_runs: Number of times all entries in the eval dataset should be
+          assessed.
+        agent_name: The name of the agent, if trying to evaluate something other
+          than root agent. If left empty or none, then root agent is evaluated.
+        print_detailed_results: Whether to print detailed results for each metric
+          evaluation.
+      """
+      if criteria:
+        logger.warning(
+            "`criteria` field is deprecated and will be removed in future"
+            " iterations. For now, we will automatically map values in `criteria`"
+            " to `eval_config`, but you should move to using `eval_config` field."
+        )
+        base_criteria = {
+            k: BaseCriterion(threshold=v) for k, v in criteria.items()
+        }
+        eval_config = EvalConfig(criteria=base_criteria)
+    
+      if eval_config is None:
+        raise ValueError("`eval_config` is required.")
+    
+      agent_for_eval = await AgentEvaluator._get_agent_for_eval(
+          module_name=agent_module, agent_name=agent_name
+      )
+      eval_metrics = get_eval_metrics_from_config(eval_config)
+    
+      user_simulator_provider = UserSimulatorProvider(
+          user_simulator_config=eval_config.user_simulator_config
+      )
+    
+      # Step 1: Perform evals, basically inferencing and evaluation of metrics
+      eval_results_by_eval_id = await AgentEvaluator._get_eval_results_by_eval_id(
+          agent_for_eval=agent_for_eval,
+          eval_set=eval_set,
+          eval_metrics=eval_metrics,
+          num_runs=num_runs,
+          user_simulator_provider=user_simulator_provider,
+      )
+    
+      # Step 2: Post-process the results!
+    
+      # We keep track of eval case failures, these are not infra failures but eval
+      # test failures. We track them and then report them towards the end.
+      failures: list[str] = []
+    
+      for _, eval_results_per_eval_id in eval_results_by_eval_id.items():
+        eval_metric_results = (
+            AgentEvaluator._get_eval_metric_results_with_invocation(
+                eval_results_per_eval_id
+            )
+        )
+        failures_per_eval_case = AgentEvaluator._process_metrics_and_get_failures(
+            eval_metric_results=eval_metric_results,
+            print_detailed_results=print_detailed_results,
+            agent_module=agent_name,
+        )
+    
+        failures.extend(failures_per_eval_case)
+    
+      failure_message = "Following are all the test failures."
+      if not print_detailed_results:
+        failure_message += (
+            " If you looking to get more details on the failures, then please"
+            " re-run this test with `print_detailed_results` set to `True`."
+        )
+      failure_message += "\n" + "\n".join(failures)
+>     assert not failures, failure_message
+             ^^^^^^^^^^^^
+E     AssertionError: Following are all the test failures.
+E     tool_trajectory_avg_score for None Failed. Expected 0.8, but got 0.0.
+E     response_match_score for None Failed. Expected 0.5, but got 0.44000000000000006.
+
+../book_agent/.venv/lib/python3.13/site-packages/google/adk/evaluation/agent_evaluator.py:193: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Summary: `EvalStatus.FAILED` for Metric: `tool_trajectory_avg_score`. Expected threshold: `0.8`, actual value: `0.0`.
++----+-------------------+---------+-------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+
+|    | eval_status       |   score |   threshold | prompt                    | expected_response         | actual_response           | expected_tool_calls       | actual_tool_calls         |
++====+===================+=========+=============+===========================+===========================+===========================+===========================+===========================+
+|  0 | EvalStatus.FAILED |       0 |         0.8 | I want a refund for order | I'm sorry to hear your    | It looks like order       | id=None args={'order_id': | id='adk-5c428595-eaad-447 |
+|    |                   |         |             | ORD-102 because it was    | order was damaged! A full | ORD-102 has already been  | 'ORD-102', 'reason':      | 3-ba01-994e092bf2ea'      |
+|    |                   |         |             | damaged.                  | refund of $35.0 has been  | refunded. Is there        | 'Damaged product'}        | args={'reason':           |
+|    |                   |         |             |                           | processed for your order  | anything else I can help  | name='issue_refund'       | 'damaged', 'order_id':    |
+|    |                   |         |             |                           | ORD-102. Your order       | you with? 🛍️              |                           | 'ORD-102'}                |
+|    |                   |         |             |                           | status has been updated   |                           |                           | name='issue_refund'       |
+|    |                   |         |             |                           | to 'refunded'. If you     |                           |                           |                           |
+|    |                   |         |             |                           | have any other questions, |                           |                           |                           |
+|    |                   |         |             |                           | feel free to ask! 🛍️      |                           |                           |                           |
++----+-------------------+---------+-------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+
+|  1 | EvalStatus.FAILED |       0 |         0.8 | I want a refund for order | I'm sorry to hear your    | Your refund for order     | id=None args={'order_id': | id='adk-0ef22e3d-65d6-429 |
+|    |                   |         |             | ORD-102 because it was    | order was damaged! A full | **ORD-102** has been      | 'ORD-102', 'reason':      | 7-bc32-afa326e55e94'      |
+|    |                   |         |             | damaged.                  | refund of $35.0 has been  | successfully processed! 🎉 | 'Damaged product'}        | args={'order_id':         |
+|    |                   |         |             |                           | processed for your order  | A full refund of $35.0    | name='issue_refund'       | 'ORD-102', 'reason':      |
+|    |                   |         |             |                           | ORD-102. Your order       | has been issued due to    |                           | 'damaged'}                |
+|    |                   |         |             |                           | status has been updated   | the item being damaged,   |                           | name='issue_refund'       |
+|    |                   |         |             |                           | to 'refunded'. If you     | and the order status has  |                           |                           |
+|    |                   |         |             |                           | have any other questions, | been updated to           |                           |                           |
+|    |                   |         |             |                           | feel free to ask! 🛍️      | **refunded**.             |                           |                           |
++----+-------------------+---------+-------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+
+
+
+
+Summary: `EvalStatus.FAILED` for Metric: `response_match_score`. Expected threshold: `0.5`, actual value: `0.44000000000000006`.
++----+-------------------+----------+-------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+
+|    | eval_status       |    score |   threshold | prompt                    | expected_response         | actual_response           | expected_tool_calls       | actual_tool_calls         |
++====+===================+==========+=============+===========================+===========================+===========================+===========================+===========================+
+|  0 | EvalStatus.FAILED | 0.266667 |         0.5 | I want a refund for order | I'm sorry to hear your    | It looks like order       | id=None args={'order_id': | id='adk-5c428595-eaad-447 |
+|    |                   |          |             | ORD-102 because it was    | order was damaged! A full | ORD-102 has already been  | 'ORD-102', 'reason':      | 3-ba01-994e092bf2ea'      |
+|    |                   |          |             | damaged.                  | refund of $35.0 has been  | refunded. Is there        | 'Damaged product'}        | args={'reason':           |
+|    |                   |          |             |                           | processed for your order  | anything else I can help  | name='issue_refund'       | 'damaged', 'order_id':    |
+|    |                   |          |             |                           | ORD-102. Your order       | you with? 🛍️              |                           | 'ORD-102'}                |
+|    |                   |          |             |                           | status has been updated   |                           |                           | name='issue_refund'       |
+|    |                   |          |             |                           | to 'refunded'. If you     |                           |                           |                           |
+|    |                   |          |             |                           | have any other questions, |                           |                           |                           |
+|    |                   |          |             |                           | feel free to ask! 🛍️      |                           |                           |                           |
++----+-------------------+----------+-------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+
+|  1 | EvalStatus.PASSED | 0.613333 |         0.5 | I want a refund for order | I'm sorry to hear your    | Your refund for order     | id=None args={'order_id': | id='adk-0ef22e3d-65d6-429 |
+|    |                   |          |             | ORD-102 because it was    | order was damaged! A full | **ORD-102** has been      | 'ORD-102', 'reason':      | 7-bc32-afa326e55e94'      |
+|    |                   |          |             | damaged.                  | refund of $35.0 has been  | successfully processed! 🎉 | 'Damaged product'}        | args={'order_id':         |
+|    |                   |          |             |                           | processed for your order  | A full refund of $35.0    | name='issue_refund'       | 'ORD-102', 'reason':      |
+|    |                   |          |             |                           | ORD-102. Your order       | has been issued due to    |                           | 'damaged'}                |
+|    |                   |          |             |                           | status has been updated   | the item being damaged,   |                           | name='issue_refund'       |
+|    |                   |          |             |                           | to 'refunded'. If you     | and the order status has  |                           |                           |
+|    |                   |          |             |                           | have any other questions, | been updated to           |                           |                           |
+|    |                   |          |             |                           | feel free to ask! 🛍️      | **refunded**.             |                           |                           |
++----+-------------------+----------+-------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+
+
+
+
+------------------------------ Captured log call -------------------------------
+WARNING  google_genai.types:types.py:6334 Warning: there are non-text parts in the response: ['function_call'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+WARNING  google_genai.types:types.py:6334 Warning: there are non-text parts in the response: ['function_call'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+WARNING  google_genai.types:types.py:6334 Warning: there are non-text parts in the response: ['function_call'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+WARNING  google_genai.types:types.py:6334 Warning: there are non-text parts in the response: ['function_call'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+WARNING  google_genai.types:types.py:6334 Warning: there are non-text parts in the response: ['function_call'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+WARNING  google_genai.types:types.py:6334 Warning: there are non-text parts in the response: ['function_call'], returning concatenated text result from text parts. Check the full candidates.content.parts accessor to get the full model response.
+=============================== warnings summary ===============================
+test_agent_eval.py::test_with_single_test_file
+  /Users/qingyue/Documents/book_agent/.venv/lib/python3.13/site-packages/google/adk/evaluation/agent_evaluator.py:153: UserWarning: [EXPERIMENTAL] UserSimulatorProvider: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+    user_simulator_provider = UserSimulatorProvider(
+
+test_agent_eval.py::test_with_single_test_file
+  /Users/qingyue/Documents/book_agent/.venv/lib/python3.13/site-packages/vertexai/_genai/types/common.py:2657: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    @model_validator(mode="after")
+
+test_agent_eval.py::test_with_single_test_file
+  /Users/qingyue/Documents/book_agent/.venv/lib/python3.13/site-packages/google/adk/evaluation/metric_evaluator_registry.py:90: UserWarning: [EXPERIMENTAL] MetricEvaluatorRegistry: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+    metric_evaluator_registry = MetricEvaluatorRegistry()
+
+test_agent_eval.py::test_with_single_test_file
+  /Users/qingyue/Documents/book_agent/.venv/lib/python3.13/site-packages/google/adk/evaluation/local_eval_service.py:79: UserWarning: [EXPERIMENTAL] UserSimulatorProvider: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+    user_simulator_provider: UserSimulatorProvider = UserSimulatorProvider(),
+
+test_agent_eval.py::test_with_single_test_file
+  /Users/qingyue/Documents/book_agent/.venv/lib/python3.13/site-packages/google/adk/evaluation/agent_evaluator.py:557: UserWarning: [EXPERIMENTAL] LocalEvalService: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+    eval_service = LocalEvalService(
+
+test_agent_eval.py::test_with_single_test_file
+  /Users/qingyue/Documents/book_agent/.venv/lib/python3.13/site-packages/google/adk/evaluation/user_simulator_provider.py:77: UserWarning: [EXPERIMENTAL] StaticUserSimulator: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+    return StaticUserSimulator(static_conversation=eval_case.conversation)
+
+test_agent_eval.py::test_with_single_test_file
+  /Users/qingyue/Documents/book_agent/.venv/lib/python3.13/site-packages/google/adk/evaluation/static_user_simulator.py:39: UserWarning: [EXPERIMENTAL] UserSimulator: This feature is experimental and may change or be removed in future versions without notice. It may introduce breaking changes at any time.
+    super().__init__(
+
+test_agent_eval.py::test_with_single_test_file
+test_agent_eval.py::test_with_single_test_file
+test_agent_eval.py::test_with_single_test_file
+test_agent_eval.py::test_with_single_test_file
+test_agent_eval.py::test_with_single_test_file
+test_agent_eval.py::test_with_single_test_file
+  /Users/qingyue/Documents/book_agent/.venv/lib/python3.13/site-packages/google/adk/runners.py:216: DeprecationWarning: The `plugins` argument is deprecated. Please use the `app` argument to provide plugins instead.
+    warnings.warn(
+
+test_agent_eval.py::test_with_single_test_file
+test_agent_eval.py::test_with_single_test_file
+test_agent_eval.py::test_with_single_test_file
+test_agent_eval.py::test_with_single_test_file
+test_agent_eval.py::test_with_single_test_file
+test_agent_eval.py::test_with_single_test_file
+  /Users/qingyue/Documents/book_agent/.venv/lib/python3.13/site-packages/google/adk/runners.py:1268: DeprecationWarning: deprecated
+    save_input_blobs_as_artifacts=run_config.save_input_blobs_as_artifacts,
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED customer_service_agent/test_agent_eval.py::test_with_single_test_file
+======================== 1 failed, 19 warnings in 7.94s ========================
